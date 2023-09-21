@@ -1,3 +1,14 @@
+const playableButtons = document.querySelectorAll('.button-container button')
+const playerText = document.querySelector('.player')
+const computerText = document.querySelector('.computer')
+const scorePlayer = document.querySelector('.scores .player .score')
+const scoreComputer = document.querySelector('.scores .computer .score')
+const result = document.querySelector('#result')
+const resetButton = document.querySelector('#reset')
+
+let resultPlayerNumber = 0
+let resultComputerNumber = 0
+
 function getComputerChoice() {
     let randomValue = Math.floor(Math.random() * 10) + 1
     if(randomValue <= 3) { // 1 2 3 
@@ -9,12 +20,11 @@ function getComputerChoice() {
     }
 }
 
-
-
 function playSingleRound(playerSelection, computerSelection) {
-    playerSelection = prompt("Choose: ROCK|PAPER|SCISSORS")
-    computerSelection = getComputerChoice()
-
+    console.log(`Player: ${playerSelection}`)
+    console.log(`Computer: ${computerSelection}`)
+    console.log(`Player score: ${resultPlayerNumber}`)
+    console.log(`Computer score: ${resultComputerNumber}`)
     if (playerSelection == null) {
         return 1
     } else if(playerSelection.toUpperCase() == "ROCK" && computerSelection.toUpperCase() == "PAPER") {
@@ -44,33 +54,58 @@ function playSingleRound(playerSelection, computerSelection) {
     } else if (playerSelection.toUpperCase() == "SCISSORS" && computerSelection.toUpperCase() == "SCISSORS") {
         return "tie"
     }
-
-
 }
 
-function game() {
-    let i = 0
-    let computerWins = 0
-    let playerWins = 0
-    let ties = 0
-    let winner = ""
-    while(i < 5) {
-        winner = playSingleRound()
-        if(winner == 1) {
-            return "Canceled."
-        } else if(winner == "player") {
-            console.log("You Win!")
-            playerWins++
-        } else if(winner == "computer"){
-            console.log("You Lose.")
-            computerWins++
-        } else {
-            console.log("Tie.")
-            ties++
-        }
-        i++
+function resetGame() {
+    playerText.style.color = 'white'
+    computerText.style.color = 'white'
+    resultComputerNumber = 0
+    resultPlayerNumber = 0
+    scoreComputer.textContent = parseInt(resultComputerNumber)
+    scorePlayer.textContent = parseInt(resultPlayerNumber)
+    result.textContent = "Press any button"
+}
+
+function verification() {
+    if(resultComputerNumber === 5) {
+        computerText.style.color = 'green'
+        scoreComputer.textContent = parseInt(resultComputerNumber)
+        result.textContent = "Press RESET to play again"
+        console.log("Computer wins")
+    } else if(resultPlayerNumber === 5) {
+        playerText.style.color = 'green'
+        scorePlayer.textContent = parseInt(resultPlayerNumber)
+        result.textContent = "Press RESET to play again"
+        console.log("Player wins")
+    } else if(resultComputerNumber >= 5 || resultPlayerNumber >= 5) {
+        resetGame()
     }
-    return `Player: ${playerWins} - Computer: ${computerWins} \nTies: ${ties}`
 }
 
-console.log(game())
+function playGame(playerSelection, computerSelection) {
+    if(playSingleRound(playerSelection.toUpperCase(), computerSelection) === "player") {
+        resultPlayerNumber++
+        scorePlayer.textContent = parseInt(resultPlayerNumber)
+        result.textContent = "Player Wins"
+    } else if(playSingleRound(playerSelection.toUpperCase(), computerSelection) === "computer") {
+        resultComputerNumber++
+        scoreComputer.textContent = parseInt(resultComputerNumber)
+        result.textContent = "Computer Wins"
+    } else {
+        result.textContent = "Tie"
+    }
+
+    verification()
+}
+
+resetButton.addEventListener('click', () => {
+    resetGame()
+})
+
+playableButtons.forEach((button) => {
+    if(resultComputerNumber < 5 && resultPlayerNumber < 5) {
+        button.addEventListener('click', () => {
+            playGame(button.id, getComputerChoice())
+        })
+    }
+})
